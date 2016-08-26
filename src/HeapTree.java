@@ -1,5 +1,7 @@
 
-
+/**
+ * Created by Albertpv on 21/7/16.
+ */
 public class HeapTree <T extends Comparable<T>> {
 
     /**
@@ -60,6 +62,37 @@ public class HeapTree <T extends Comparable<T>> {
         maxHeapMode = true;
         elements = 0;
         current = 0;
+    }
+
+    /**
+     * This method gets the element on the root and extracts it from the tree.
+     *
+     * @return the element on the root or null if the tree is empty.
+     */
+    public T extract() {
+
+        T element = top();
+        nodes[FIRST_ELEMENT] = null;
+
+        // there was an element in the tree, now it is time to shift the array of nodes
+        if (element != null && elements > 0) {
+
+            elements--;
+
+            // for the next insertions. If we delete this son, we need to be situated on the parent
+            // putting the future next element where we are removing the current one
+            current = getParentPos(elements);
+
+            System.out.println("CURRENT --> " + current);
+            nodes[FIRST_ELEMENT] = nodes[elements];
+            nodes[elements] = null;
+
+            resort();
+
+            System.out.println("CURRENT NOW --> " + current);
+        }
+
+        return element;
     }
 
     private int getLeftSonPos(int parentPos) {
@@ -151,6 +184,83 @@ public class HeapTree <T extends Comparable<T>> {
         nodes = copy;
     }
 
+    /**
+     * This method is called when an element is extracted from the tree.
+     *
+     * When it happens, the last element inserted is moved to the root of the tree
+     * having to resort the structure as a consequence.
+     */
+    private void resort() {
+        boolean ordered = false;
+        int current = FIRST_ELEMENT;
+
+        while (!ordered) {
+
+            int left = getLeftSonPos(current);
+            int right = getRightSonPos(current);
+
+            // there are not more elements in this branch of the tree, it is ordered then
+            if (left >= elements) ordered = true;
+            else {
+
+                if (maxHeapMode) {
+
+                    // if there is no element on the right or the element on the left is bigger
+                    if (nodes[right] == null || nodes[left].element.compareTo(nodes[right].element) > 0) {
+
+                        // the element on the left is bigger than the current one, we need to swap them
+                        if (nodes[current].element.compareTo(nodes[left].element) < 0) {
+
+                            T aux = (T) nodes[current].element;
+                            nodes[current].element = nodes[left].element;
+                            nodes[left].element = aux;
+                            current = left;
+                        }
+                        else ordered = true;
+                    }
+                    else if (nodes[left].element.compareTo(nodes[right].element) < 0) {
+
+                        // the element on the right is bigger than the current one, we need to swap them
+                        if (nodes[current].element.compareTo(nodes[right].element) < 0) {
+                            T aux = (T) nodes[current].element;
+                            nodes[current].element = nodes[right].element;
+                            nodes[right].element = aux;
+                            current = right;
+                        }
+                        else ordered = true;
+                    }
+                }
+                else {  // min heap case
+
+                    // if there is no element on the right or the element on the left is smaller
+                    if (nodes[right] == null || nodes[left].element.compareTo(nodes[right].element) < 0) {
+
+                        // the element on the left is smaller than the current one, we need to swap them
+                        if (nodes[current].element.compareTo(nodes[left].element) > 0) {
+
+                            T aux = (T) nodes[current].element;
+                            nodes[current].element = nodes[left].element;
+                            nodes[left].element = aux;
+                            current = left;
+                        }
+                        else ordered = true;
+                    }
+                    else if (nodes[left].element.compareTo(nodes[right].element) > 0) {
+
+                        // the element on the right is smaller than the current one, we need to swap them
+                        if (nodes[current].element.compareTo(nodes[right].element) > 0) {
+
+                            T aux = (T) nodes[current].element;
+                            nodes[current].element = nodes[right].element;
+                            nodes[right].element = aux;
+                            current = right;
+                        }
+                        else ordered = true;
+                    }
+                }
+            }
+        }
+    }
 
 
     // improvement for the future: copy all into a new tree and set maxheapmode
@@ -216,6 +326,16 @@ public class HeapTree <T extends Comparable<T>> {
         }
     }
 
+    /**
+     * @return the element in the root if it exists, null if not.
+     */
+    public T top() {
+
+        if (nodes == null) return null;
+
+        return (T) nodes[FIRST_ELEMENT].element;
+    }
+
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -251,29 +371,44 @@ public class HeapTree <T extends Comparable<T>> {
         HeapTree<Integer> heapTree = new HeapTree<>();
 
         try {
-            heapTree.setMinHeapMode(true);
+            heapTree.setMinHeapMode(false);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
 
+
         heapTree.put(4);
         heapTree.put(12);
-        System.out.println(heapTree.toString());
         heapTree.put(14);
-        System.out.println(heapTree.toString());
         heapTree.put(5);
-        System.out.println(heapTree.toString());
         heapTree.put(8);
-        System.out.println(heapTree.toString());
         heapTree.put(15);
-        System.out.println(heapTree.toString());
         heapTree.put(30);
         heapTree.put(1);
 
         System.out.println("Size: " + heapTree.size());
         System.out.println(heapTree.toString());
 
+        int extract = heapTree.extract();
+        System.out.println("Extracted: " + extract);
+        System.out.println(heapTree.toString());
 
+        extract = heapTree.extract();
+        System.out.println("Extracted: " + extract);
+        System.out.println(heapTree.toString());
+
+        extract = heapTree.extract();
+        System.out.println("Extracted: " + extract);
+        System.out.println(heapTree.toString());
+
+
+        heapTree.put(6);
+        heapTree.put(13);
+
+        System.out.println(heapTree.toString());
+
+
+        /*
         HeapTree<String> stringHeapTree = new HeapTree<>();
 
         stringHeapTree.put("Albert");
@@ -283,6 +418,13 @@ public class HeapTree <T extends Comparable<T>> {
         stringHeapTree.put("Marti");
 
         System.out.println(stringHeapTree.toString());
+
+        String extracted = stringHeapTree.extract();
+        System.out.println("Extracted: " + extracted);
+
+        System.out.println(stringHeapTree.toString());
+
+        */
     }
 
 }
