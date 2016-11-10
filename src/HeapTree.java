@@ -194,7 +194,7 @@ public class HeapTree <T extends Comparable<T>> {
         SIZE += RESIZE_INCREMENT;
 
         @SuppressWarnings("unchecked")
-        Node[] copy = (Node[]) new Object[SIZE];
+        Node[] copy = (Node[]) Array.newInstance(Node.class, SIZE);
 
         System.arraycopy(nodes, 0, copy, 0, elements);
 
@@ -425,6 +425,7 @@ public class HeapTree <T extends Comparable<T>> {
 
         System.out.println(heapTree.toString());
 
+        for (int i = 0; i < 200; i++) heapTree.put(i);
 
         /*
         HeapTree<String> stringHeapTree = new HeapTree<>();
