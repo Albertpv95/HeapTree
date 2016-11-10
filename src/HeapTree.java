@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 
 /**
  * Created by Albertpv on 21/7/16.
@@ -34,7 +35,7 @@ public class HeapTree <T extends Comparable<T>> {
      * A constant value to determinate when a HeapTree instance
      * must be resized to allocate a new maximum of elements.
      */
-    private static final double RESIZE_FACTOR    = 0.80;
+    private static final double RESIZE_FACTOR    = 0.90;
 
     /**
      * Initially, the heap tree can store 100 elements.
@@ -54,9 +55,10 @@ public class HeapTree <T extends Comparable<T>> {
      * Creates a new HeapTree with 100 nodes of space allocated
      * and max mode enabled by default.
      */
+    @SuppressWarnings("unchecked")
     public HeapTree() {
 
-        nodes = new Node[SIZE];
+        nodes = (Node[]) Array.newInstance(Node.class, SIZE);
         for (int i = 0; i < SIZE; i++) nodes[i] = null;
 
         maxHeapMode = true;
@@ -83,13 +85,10 @@ public class HeapTree <T extends Comparable<T>> {
             // putting the future next element where we are removing the current one
             current = getParentPos(elements);
 
-            System.out.println("CURRENT --> " + current);
             nodes[FIRST_ELEMENT] = nodes[elements];
             nodes[elements] = null;
 
             resort();
-
-            System.out.println("CURRENT NOW --> " + current);
         }
 
         return element;
@@ -126,8 +125,7 @@ public class HeapTree <T extends Comparable<T>> {
 
         // first element case
         if (current == FIRST_ELEMENT && nodes[current] == null) {
-            System.out.println("Adding root: " + element.toString());
-            nodes[current] = new Node<>(element);
+            nodes[current] = new Node(element);
             elements++;
         }
         else {
@@ -135,9 +133,7 @@ public class HeapTree <T extends Comparable<T>> {
             int pos = getLeftSonPos(current);
             if (nodes[pos] == null) {           // still no leftSon,
 
-                System.out.println("Adding left: " + element.toString() + " in pos: " + pos);
-
-                nodes[pos] = new Node<>(element);
+                nodes[pos] = new Node(element);
                 nodes[current].leftSon = nodes[pos];
                 elements++;
             }
@@ -145,8 +141,7 @@ public class HeapTree <T extends Comparable<T>> {
 
                 pos = getRightSonPos(current);
                 if (nodes[pos] == null) {           // this condition must be always true, but just in case
-                    System.out.println("Adding right: " + element.toString() + " in pos: " + pos);
-                    nodes[pos] = new Node<>(element);
+                    nodes[pos] = new Node(element);
                     nodes[current].rightSon = nodes[pos];
                     elements++;
                     current++;
@@ -178,8 +173,11 @@ public class HeapTree <T extends Comparable<T>> {
     private void resizeTree() {
 
         SIZE += RESIZE_INCREMENT;
-        Node[] copy = new Node[SIZE];
-        for (int i = 0; i < elements; i++) copy[i] = nodes[i];
+
+        @SuppressWarnings("unchecked")
+        Node[] copy = (Node[]) new Object[SIZE];
+
+        System.arraycopy(nodes, 0, copy, 0, elements);
 
         nodes = copy;
     }
@@ -211,7 +209,7 @@ public class HeapTree <T extends Comparable<T>> {
                         // the element on the left is bigger than the current one, we need to swap them
                         if (nodes[current].element.compareTo(nodes[left].element) < 0) {
 
-                            T aux = (T) nodes[current].element;
+                            T aux = nodes[current].element;
                             nodes[current].element = nodes[left].element;
                             nodes[left].element = aux;
                             current = left;
@@ -222,7 +220,7 @@ public class HeapTree <T extends Comparable<T>> {
 
                         // the element on the right is bigger than the current one, we need to swap them
                         if (nodes[current].element.compareTo(nodes[right].element) < 0) {
-                            T aux = (T) nodes[current].element;
+                            T aux = nodes[current].element;
                             nodes[current].element = nodes[right].element;
                             nodes[right].element = aux;
                             current = right;
@@ -238,7 +236,7 @@ public class HeapTree <T extends Comparable<T>> {
                         // the element on the left is smaller than the current one, we need to swap them
                         if (nodes[current].element.compareTo(nodes[left].element) > 0) {
 
-                            T aux = (T) nodes[current].element;
+                            T aux = nodes[current].element;
                             nodes[current].element = nodes[left].element;
                             nodes[left].element = aux;
                             current = left;
@@ -250,7 +248,7 @@ public class HeapTree <T extends Comparable<T>> {
                         // the element on the right is smaller than the current one, we need to swap them
                         if (nodes[current].element.compareTo(nodes[right].element) > 0) {
 
-                            T aux = (T) nodes[current].element;
+                            T aux = nodes[current].element;
                             nodes[current].element = nodes[right].element;
                             nodes[right].element = aux;
                             current = right;
@@ -268,7 +266,7 @@ public class HeapTree <T extends Comparable<T>> {
 
         if (elements > 0) throw new IllegalAccessException("This method can only be called if the heap is empty.");
 
-        if (maxHeapMode == true) this.maxHeapMode = true;
+        if (maxHeapMode) this.maxHeapMode = true;
         else this.maxHeapMode = false;
 
     }
@@ -278,7 +276,7 @@ public class HeapTree <T extends Comparable<T>> {
 
         if (elements > 0) throw new IllegalAccessException("This method can only be called if the heap is empty.");
 
-        if (minHeapMode == true) maxHeapMode = false;
+        if (minHeapMode) maxHeapMode = false;
         else maxHeapMode = true;
     }
 
@@ -297,7 +295,6 @@ public class HeapTree <T extends Comparable<T>> {
      *
      * SuppressWarnings: the default warnings about casts that aren't checked can be ignored...
      */
-    @SuppressWarnings("unchecked")
     private void sort(int addedPos) {
         int parentPos = getParentPos(addedPos);
         boolean ordered = false;
@@ -307,17 +304,17 @@ public class HeapTree <T extends Comparable<T>> {
             // the new element is smaller and we are in minHeapMode
             if (nodes[addedPos].element.compareTo(nodes[parentPos].element) < 0 && !maxHeapMode) {
 
-                T aux = (T) nodes[addedPos].element;
+                T aux = nodes[addedPos].element;
                 nodes[addedPos].element = nodes[parentPos].element;
-                nodes[parentPos].element = (T) aux;
+                nodes[parentPos].element = aux;
                 addedPos = parentPos;
             }
             // the new element is bigger and we are in maxHeapMode
             else if (nodes[addedPos].element.compareTo(nodes[parentPos].element) > 0 && maxHeapMode) {
 
-                T aux = (T) nodes[addedPos].element;
+                T aux = nodes[addedPos].element;
                 nodes[addedPos].element = nodes[parentPos].element;
-                nodes[parentPos].element = (T) aux;
+                nodes[parentPos].element = aux;
                 addedPos = parentPos;
             }
             else ordered = true;
@@ -333,19 +330,22 @@ public class HeapTree <T extends Comparable<T>> {
 
         if (nodes == null) return null;
 
-        return (T) nodes[FIRST_ELEMENT].element;
+        return nodes[FIRST_ELEMENT].element;
     }
 
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < elements; i++)
-            stringBuilder.append(nodes[i].element.toString() + '\n');
+        for (int i = 0; i < elements; i++) {
+            stringBuilder.append(nodes[i].element.toString());
+            stringBuilder.append("\n");
+        }
+
 
         return stringBuilder.toString();
     }
 
-    private class Node<T extends Comparable<T>> {
+    private class Node {
 
         T element;
         Node leftSon;
@@ -363,7 +363,6 @@ public class HeapTree <T extends Comparable<T>> {
             this.leftSon = leftSon;
             this.rightSon = rightSon;
         }
-
     }
 
     public static void main(String[] args) {
