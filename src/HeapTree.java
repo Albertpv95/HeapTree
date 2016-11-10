@@ -59,7 +59,6 @@ public class HeapTree <T extends Comparable<T>> {
     public HeapTree() {
 
         nodes = (Node[]) Array.newInstance(Node.class, SIZE);
-        for (int i = 0; i < SIZE; i++) nodes[i] = null;
 
         maxHeapMode = true;
         elements = 0;
