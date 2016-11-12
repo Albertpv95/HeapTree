@@ -425,8 +425,6 @@ public class HeapTree <T extends Comparable<T>> {
 
         System.out.println(heapTree.toString());
 
-        for (int i = 0; i < 200; i++) heapTree.put(i);
-
         /*
         HeapTree<String> stringHeapTree = new HeapTree<>();
 
