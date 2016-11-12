@@ -21,7 +21,6 @@ import java.lang.reflect.Array;
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  *
- * Created by Albertpv on 21/7/16.
  */
 public class HeapTree <T extends Comparable<T>> {
 

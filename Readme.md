@@ -1,6 +1,6 @@
 #Heap Tree
 
-This project implements a Heap Tree in Java that can be used as a Max Heap or Min Heap.
+This project implements a Generic Heap Tree in Java that can be used as a Max Heap or Min Heap.
 
 ## Methods:
 
